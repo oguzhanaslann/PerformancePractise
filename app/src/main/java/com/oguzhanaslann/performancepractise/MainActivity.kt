@@ -1,16 +1,10 @@
 package com.oguzhanaslann.performancepractise
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.metrics.performance.JankStats
-import androidx.metrics.performance.PerformanceMetricsState
+import androidx.core.os.trace
 import com.oguzhanaslann.performancepractise.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,5 +15,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.textView.onClick {
+            trace("Main Text Click") {
+                text = text.toString() + text.last().toString()
+            }
+        }
     }
+}
+
+inline fun <reified T : View> T.onClick( crossinline l: T.() -> Unit) {
+    setOnClickListener { l(it as T) }
 }

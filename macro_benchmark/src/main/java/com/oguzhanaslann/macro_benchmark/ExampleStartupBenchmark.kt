@@ -1,9 +1,9 @@
 package com.oguzhanaslann.macro_benchmark
 
-import androidx.benchmark.macro.StartupMode
-import androidx.benchmark.macro.StartupTimingMetric
+import androidx.benchmark.macro.*
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.By
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,11 +27,13 @@ class ExampleStartupBenchmark {
 
     private val packageName = "com.oguzhanaslann.performancepractise"
 
+    private val iterationCount = 1
+
     @Test
     fun startup() = benchmarkRule.measureRepeated(
         packageName = packageName,
         metrics = listOf(StartupTimingMetric()),
-        iterations = 5,
+        iterations = iterationCount,
         startupMode = StartupMode.COLD
     ) {
         pressHome()
@@ -43,7 +45,7 @@ class ExampleStartupBenchmark {
     fun startupWarm() = benchmarkRule.measureRepeated(
         packageName = packageName,
         metrics = listOf(StartupTimingMetric()),
-        iterations = 5,
+        iterations = iterationCount,
         startupMode = StartupMode.WARM
     ) {
         pressHome()
@@ -54,11 +56,35 @@ class ExampleStartupBenchmark {
     @Test
     fun startupHot() = benchmarkRule.measureRepeated(
         packageName = packageName,
-        metrics = listOf(StartupTimingMetric()),
-        iterations = 5,
+        metrics = listOf(
+            StartupTimingMetric(),
+            FrameTimingMetric()
+        ),
+        iterations = iterationCount,
         startupMode = StartupMode.HOT
     ) {
         pressHome()
         startActivityAndWait()
+    }
+
+    // trace main text view click
+    @OptIn(ExperimentalMetricApi::class)
+    @Test
+    fun traceMainTextViewClick() = benchmarkRule.measureRepeated(
+        packageName = packageName,
+        metrics = listOf(
+            StartupTimingMetric(),
+            FrameTimingMetric(),
+            TraceSectionMetric("Main Text Click")
+        ),
+        iterations = iterationCount,
+        startupMode = StartupMode.COLD,
+        setupBlock =  {
+            pressHome()
+            startActivityAndWait()
+        }
+    ) {
+        val textView = device.findObject(By.res(packageName, "textView"))
+        textView.click()
     }
 }
