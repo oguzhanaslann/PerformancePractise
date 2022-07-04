@@ -21,6 +21,9 @@ class MainActivity : AppCompatActivity() {
                 text = text.toString() + text.last().toString()
             }
         }
+
+        val listToSort = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).shuffled()
+        listToSort.sorted()
     }
 }
 
